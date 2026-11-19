@@ -6,8 +6,8 @@
   "sdk": 3,
   "name": { "en": "Auk", "no": "Auk" },
   "description": {
-    "en": "Follow and control your Auk Mini 2 indoor garden",
-    "no": "Følg med på og styr Auk Mini 2-hagen din"
+    "en": "Follow and control your Auk indoor garden",
+    "no": "Følg med på og styr Auk-hagen din"
   },
   "category": "appliances",
   "tags": {
