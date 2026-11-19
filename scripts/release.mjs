@@ -1,0 +1,275 @@
+#!/usr/bin/env node
+// Cuts an Auk release without shell quoting: every git, gh and homey call
+// gets its arguments as an array, and the changelog comes from a file.
+//
+//   npm run release -- start <patch|minor|major> <changelog-file> [--dry-run]
+//   npm run release -- finish
+//   npm run release -- publish
+//
+// `start` branches `bump-X.Y.Z` off origin/main, bumps the version and
+// changelog, validates, commits, tags locally, pushes the branch and opens the
+// PR with rebase auto-merge (main rejects direct pushes). `--dry-run` stops
+// before pushing and removes the branch and tag again.
+// `finish` waits for that PR to merge, checks origin/main's app.json carries
+// the version, and only then pushes the tag, so a tag never outlives a bump
+// that did not land. It fast-forwards local main when that is checked out.
+// `publish` runs `homey app publish` headless (no version prompt, so no second bump) from a clean checkout of
+// origin/main whose version has its tag. The upload lands as a draft build in
+// the Homey developer dashboard, where it is promoted to Test and Live. Athom
+// processes the upload after the CLI reports success and can still fail it
+// (`processing_failed`), so `publish` then waits for
+// the build to leave processing and fails unless it reached draft.
+//
+// `homey app version --commit` is not used: it builds its git commit through a
+// shell without escaping, so a straight double quote in the changelog breaks it.
+//
+// The commit and pushes skip git hooks. The bump touches only the version
+// files, `start` validates the app itself, and the bump PR's CI checks the
+// rest; the hooks would only re-run checks origin/main has already passed.
+
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { homedir, tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+
+const LEVELS = ["patch", "minor", "major"];
+const BUMP_FILES = ["app.json", ".homeycompose/app.json", ".homeychangelog.json"];
+const MERGE_POLL_MS = 30_000;
+const MERGE_TIMEOUT_MS = 90 * 60_000;
+const APP_ID = JSON.parse(readFileSync("app.json", "utf8")).id;
+const BUILD_POLL_MS = 10_000;
+const BUILD_TIMEOUT_MS = 10 * 60_000;
+
+const fail = (message) => {
+  console.error(`release: ${message}`);
+  process.exit(1);
+};
+
+const run = (cmd, args, options = {}) => {
+  console.log(`$ ${cmd} ${args.join(" ")}`);
+  execFileSync(cmd, args, { stdio: "inherit", ...options });
+};
+
+const read = (cmd, args) => execFileSync(cmd, args, { encoding: "utf8" }).trim();
+
+const succeeds = (cmd, args) => {
+  try {
+    execFileSync(cmd, args, { stdio: "ignore" });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const versionAt = (ref) => JSON.parse(read("git", ["show", `${ref}:app.json`])).version;
+
+const increment = (version, level) => {
+  const [major, minor, patch] = version.split(".").map(Number);
+  if (level === "major") return `${major + 1}.0.0`;
+  if (level === "minor") return `${major}.${minor + 1}.0`;
+  return `${major}.${minor}.${patch + 1}`;
+};
+
+const compareVersions = (a, b) => {
+  const pa = a.split(".").map(Number);
+  const pb = b.split(".").map(Number);
+  for (let i = 0; i < 3; i += 1) {
+    if (pa[i] !== pb[i]) return pa[i] - pb[i];
+  }
+  return 0;
+};
+
+const releaseTags = () => read("git", ["tag", "--list", "v*"])
+  .split("\n")
+  .map((tag) => tag.slice(1))
+  .filter((version) => /^\d+\.\d+\.\d+$/.test(version))
+  .sort(compareVersions);
+
+const remoteHasTag = (tag) => read("git", ["ls-remote", "--tags", "origin", `refs/tags/${tag}`]) !== "";
+
+const requireCleanTree = () => {
+  if (read("git", ["status", "--porcelain"]) !== "") fail("the working tree has changes; commit or stash them first");
+};
+
+const fetchOrigin = () => run("git", ["fetch", "origin", "main", "--tags"]);
+
+const withTempFile = (text, use) => {
+  const dir = mkdtempSync(join(tmpdir(), "auk-release-"));
+  const file = join(dir, "message.txt");
+  writeFileSync(file, text);
+  try {
+    return use(file);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+};
+
+const start = (level, changelogFile, dryRun) => {
+  if (!LEVELS.includes(level)) fail(`level must be one of ${LEVELS.join(", ")}`);
+  if (!changelogFile) fail("pass the changelog as a file: start <level> <changelog-file>");
+  const changelog = readFileSync(changelogFile, "utf8").trim();
+  if (changelog.length < 20) fail(`${changelogFile} holds no changelog text`);
+
+  requireCleanTree();
+  fetchOrigin();
+  const current = versionAt("origin/main");
+  const latestTag = releaseTags().at(-1);
+  // A pushed tag ahead of main means an earlier bump never landed; cutting
+  // from here would reuse its version over a published release.
+  if (latestTag && compareVersions(latestTag, current) > 0) {
+    fail(`tag v${latestTag} is ahead of origin/main's app.json (${current}); land that bump first`);
+  }
+  const next = increment(current, level);
+  const tag = `v${next}`;
+  const branch = `bump-${next}`;
+  if (succeeds("git", ["rev-parse", "--verify", "--quiet", `refs/tags/${tag}`]) || remoteHasTag(tag)) {
+    fail(`tag ${tag} already exists`);
+  }
+  if (succeeds("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`])) fail(`branch ${branch} already exists`);
+
+  const startBranch = read("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+  const leaveBranch = () => {
+    run("git", ["switch", startBranch === "HEAD" ? "--detach" : startBranch, ...(startBranch === "HEAD" ? ["origin/main"] : [])]);
+    run("git", ["branch", "-D", branch]);
+  };
+  run("git", ["switch", "-c", branch, "origin/main"]);
+  run("homey", ["app", "version", next, "--changelog", changelog]);
+  run("homey", ["app", "validate"]);
+  const changed = [
+    ...read("git", ["diff", "--name-only"]).split("\n"),
+    ...read("git", ["ls-files", "--others", "--exclude-standard"]).split("\n"),
+  ].filter(Boolean);
+  const unexpected = changed.filter((file) => !BUMP_FILES.includes(file));
+  if (unexpected.length > 0) fail(`the bump changed more than the version files: ${unexpected.join(", ")}`);
+  run("git", ["add", ...BUMP_FILES]);
+  withTempFile(`Bump version to ${tag}\n\nChangelog: ${changelog}\n`, (file) => run("git", ["commit", "--no-verify", "-F", file]));
+  withTempFile(`${changelog}\n`, (file) => run("git", ["tag", "-a", tag, "-F", file]));
+
+  if (dryRun) {
+    console.log(`\nDry run: ${branch} and ${tag} were built locally; removing them.`);
+    run("git", ["tag", "-d", tag]);
+    leaveBranch();
+    return;
+  }
+
+  run("git", ["push", "--no-verify", "-u", "origin", branch]);
+  run("gh", ["pr", "create", "--base", "main", "--head", branch, "--title", `Bump version to ${tag}`, "--body", `Release ${tag}.\n\n${changelog}`]);
+  run("gh", ["pr", "merge", branch, "--rebase", "--auto", "--delete-branch"]);
+  if (startBranch !== "HEAD") run("git", ["switch", startBranch]);
+  console.log(`\nThe ${tag} bump PR merges once CI passes. Then run: npm run release -- finish`);
+};
+
+const pendingTag = () => {
+  const local = releaseTags();
+  const unpushed = local.filter((version) => !remoteHasTag(`v${version}`));
+  if (unpushed.length !== 1) {
+    fail(unpushed.length === 0
+      ? "no local release tag is waiting to be pushed; run start first"
+      : `several unpushed release tags: ${unpushed.map((v) => `v${v}`).join(", ")}`);
+  }
+  return unpushed[0];
+};
+
+const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+
+const waitForMerge = async (branch) => {
+  const deadline = Date.now() + MERGE_TIMEOUT_MS;
+  for (;;) {
+    const state = read("gh", ["pr", "view", branch, "--json", "state", "--jq", ".state"]);
+    if (state === "MERGED") return;
+    if (state === "CLOSED") fail(`the ${branch} PR was closed without merging`);
+    if (Date.now() > deadline) fail(`the ${branch} PR has not merged after ${MERGE_TIMEOUT_MS / 60_000} minutes`);
+    console.log(`${new Date().toLocaleTimeString()} ${branch} is ${state}; checking again in ${MERGE_POLL_MS / 1000} s`);
+    await sleep(MERGE_POLL_MS);
+  }
+};
+
+const finish = async () => {
+  const version = pendingTag();
+  const tag = `v${version}`;
+  const branch = `bump-${version}`;
+  await waitForMerge(branch);
+  fetchOrigin();
+  const landed = versionAt("origin/main");
+  if (landed !== version) fail(`origin/main's app.json reads ${landed}, not ${version}; the tag stays local`);
+  run("git", ["push", "--no-verify", "origin", tag]);
+  const current = read("git", ["rev-parse", "--abbrev-ref", "HEAD"]);
+  if (current === "main" && read("git", ["status", "--porcelain"]) === "") run("git", ["merge", "--ff-only", "origin/main"]);
+  if (succeeds("git", ["rev-parse", "--verify", "--quiet", `refs/heads/${branch}`])) run("git", ["branch", "-D", branch]);
+  console.log(`\n${tag} is on origin/main and its tag is pushed. To publish: npm run release -- publish`);
+};
+
+const publish = async () => {
+  requireCleanTree();
+  fetchOrigin();
+  if (!succeeds("git", ["diff", "--quiet", "HEAD", "origin/main"])) fail("check out origin/main (or fast-forward main) before publishing");
+  const version = versionAt("HEAD");
+  if (!remoteHasTag(`v${version}`)) fail(`v${version} has no pushed tag; run finish first`);
+  // Headless skips the version prompt (its default would bump again) and
+  // fails rather than asking if the changelog entry is missing.
+  const uploadedAfterMs = Date.now();
+  run("homey", ["app", "publish"], { env: { ...process.env, HOMEY_HEADLESS: "1" } });
+  await awaitBuildProcessed(version, uploadedAfterMs);
+};
+
+// The Homey CLI package, for its own login: Volta shims the binary, and the
+// package lives in Volta's image or beside the binary.
+const homeyCliDir = () => {
+  const bin = realpathSync(read("which", ["homey"]));
+  const candidates = [
+    join(homedir(), ".volta/tools/image/packages/homey/lib/node_modules/homey"),
+    resolve(dirname(bin), "..", "lib", "node_modules", "homey"),
+    resolve(dirname(bin), ".."),
+  ];
+  const found = candidates.find((dir) => existsSync(join(dir, "lib", "AthomApi.js")));
+  if (!found) fail(`the upload went through, but the Homey CLI package was not found from ${bin} to check its build`);
+  return found;
+};
+
+// Waits for Athom to finish processing the build this publish uploaded (the
+// newest build of `version` created after the upload began) and fails unless
+// it reached draft.
+const awaitBuildProcessed = async (version, uploadedAfterMs) => {
+  const cli = homeyCliDir();
+  const require = createRequire(join(cli, "package.json"));
+  const AthomApi = require(join(cli, "lib", "AthomApi.js"));
+  const { AthomAppsAPI } = require("homey-api");
+  const athom = typeof AthomApi === "function" ? new AthomApi() : AthomApi;
+  const apps = new AthomAppsAPI();
+  const deadline = Date.now() + BUILD_TIMEOUT_MS;
+  for (;;) {
+    const $token = await athom.createDelegationToken({ audience: "apps" });
+    const build = (await apps.getBuilds({ $token, appId: APP_ID }))
+      .filter((entry) => entry.version === version && Date.parse(entry.createdAt) >= uploadedAfterMs - 60_000)
+      .sort((a, b) => b.id - a.id)[0];
+    if (build && build.state !== "processing") {
+      if (build.state === "draft") {
+        console.log(`Build ${build.id} (${version}) processed and waits as a draft. Promote it at `
+          + `https://tools.developer.homey.app/apps/app/${APP_ID}/build/${build.id}`);
+        return;
+      }
+      fail(`build ${build.id} (${version}) ended ${build.state}${build.stateMeta ? ` (${build.stateMeta})` : ""}; `
+        + "run publish again to upload a new build");
+    }
+    if (Date.now() > deadline) {
+      fail(`build ${build ? build.id : "for " + version} is still ${build ? build.state : "not listed"} after `
+        + `${BUILD_TIMEOUT_MS / 60_000} min; check the developer dashboard`);
+    }
+    console.log(`${build ? `build ${build.id} is ${build.state}` : `no ${version} build listed yet`}; `
+      + `checking again in ${BUILD_POLL_MS / 1000} s`);
+    await sleep(BUILD_POLL_MS);
+  }
+};
+
+const [command, ...rest] = process.argv.slice(2);
+if (command === "start") {
+  const positional = rest.filter((arg) => arg !== "--dry-run");
+  start(positional[0], positional[1], rest.includes("--dry-run"));
+} else if (command === "finish") {
+  await finish();
+} else if (command === "publish") {
+  await publish();
+} else {
+  fail("usage: npm run release -- start <patch|minor|major> <changelog-file> [--dry-run] | finish | publish");
+}

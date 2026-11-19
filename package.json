@@ -17,7 +17,8 @@
     "test": "npm run typecheck && vitest run --config vitest.config.ts --coverage.enabled",
     "test:vitest": "vitest run --config vitest.config.ts",
     "start": "homey app run --remote",
-    "validate": "npm run lint && npm test && homey app validate"
+    "validate": "npm run lint && npm test && homey app validate",
+    "release": "node scripts/release.mjs"
   },
   "dependencies": {
     "source-map-support": "^0.5.21"
