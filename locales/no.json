@@ -1,0 +1,25 @@
+{
+  "pair": {
+    "no_devices": "Fant ingen Auk Mini 2. Flytt Homey nærmere, og hvis hagen er registrert i Auk-appen, fjern den fra Auk-appen først."
+  },
+  "errors": {
+    "not_connected": "Får ikke kontakt med Auk Mini 2 over Bluetooth akkurat nå",
+    "invalid_time": "Bruk et klokkeslett som 07:00"
+  },
+  "status": {
+    "reconnecting": "Får ikke kontakt med hagen over Bluetooth. Hvis den er registrert i Auk-appen, fjern den der; appen tar den eneste Bluetooth-plassen."
+  },
+  "modes": {
+    "light": {
+      "auto": "Tidsplan",
+      "full": "På",
+      "dim": "Dempet",
+      "off": "Av"
+    },
+    "growth": {
+      "herbs": "Urter og salat",
+      "fruit": "Frukt og grønt",
+      "slow": "Sakte"
+    }
+  }
+}

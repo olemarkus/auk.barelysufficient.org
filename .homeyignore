@@ -1,0 +1,12 @@
+/.homeybuild/
+/coverage/
+/test/
+/scripts/
+/AGENTS.md
+/README.md
+/LICENSE
+/.gitignore
+/eslint.config.mjs
+/tsconfig*.json
+/vitest.config.ts
+.claude/

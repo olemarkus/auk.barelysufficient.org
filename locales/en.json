@@ -1,0 +1,25 @@
+{
+  "pair": {
+    "no_devices": "No Auk Mini 2 found. Move Homey closer, and if the garden is registered in the Auk app, remove it there first (Settings → Remove Device)."
+  },
+  "errors": {
+    "not_connected": "Can't reach the Auk Mini 2 over Bluetooth right now",
+    "invalid_time": "Use a time like 07:00"
+  },
+  "status": {
+    "reconnecting": "Can't reach the garden over Bluetooth. If it is registered in the Auk app, remove it there; the app takes the only Bluetooth slot."
+  },
+  "modes": {
+    "light": {
+      "auto": "Schedule",
+      "full": "On",
+      "dim": "Dimmed",
+      "off": "Off"
+    },
+    "growth": {
+      "herbs": "Herbs & salads",
+      "fruit": "Fruits & veggies",
+      "slow": "Slow"
+    }
+  }
+}

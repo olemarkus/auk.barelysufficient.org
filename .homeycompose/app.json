@@ -1,0 +1,28 @@
+{
+  "id": "org.barelysufficient.auk",
+  "version": "0.1.0",
+  "compatibility": ">=12.3.0",
+  "platforms": ["local"],
+  "sdk": 3,
+  "name": { "en": "Auk", "no": "Auk" },
+  "description": {
+    "en": "Follow and control your Auk Mini 2 indoor garden",
+    "no": "Følg med på og styr Auk Mini 2-hagen din"
+  },
+  "category": "appliances",
+  "tags": {
+    "en": ["auk", "auk mini 2", "indoor garden", "grow light", "bluetooth"],
+    "no": ["auk", "auk mini 2", "innendørshage", "vekstlys", "bluetooth"]
+  },
+  "permissions": ["homey:wireless:ble"],
+  "brandColor": "#075D39",
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Ole Markus With",
+    "email": "olemarkus@gmail.com"
+  }
+}

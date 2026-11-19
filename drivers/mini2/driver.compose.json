@@ -1,0 +1,84 @@
+{
+  "name": {
+    "en": "Auk Mini 2",
+    "no": "Auk Mini 2"
+  },
+  "class": "light",
+  "capabilities": [
+    "onoff",
+    "auk_light_mode",
+    "auk_growth_mode",
+    "auk_light_on_time",
+    "auk_next_light_off"
+  ],
+  "capabilitiesOptions": {
+    "onoff": {
+      "title": {
+        "en": "Light",
+        "no": "Lys"
+      }
+    }
+  },
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "ble"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ],
+  "settings": [
+    {
+      "type": "group",
+      "label": {
+        "en": "Device",
+        "no": "Enhet"
+      },
+      "children": [
+        {
+          "id": "firmware",
+          "type": "label",
+          "label": {
+            "en": "Firmware",
+            "no": "Fastvare"
+          },
+          "value": ""
+        },
+        {
+          "id": "address",
+          "type": "label",
+          "label": {
+            "en": "Bluetooth address",
+            "no": "Bluetooth-adresse"
+          },
+          "value": ""
+        },
+        {
+          "id": "clock_drift",
+          "type": "label",
+          "label": {
+            "en": "Clock drift before last sync",
+            "no": "Klokkeavvik før siste synk"
+          },
+          "value": ""
+        }
+      ]
+    }
+  ]
+}

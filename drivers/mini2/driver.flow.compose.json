@@ -1,0 +1,440 @@
+{
+  "triggers": [
+    {
+      "id": "light_mode_changed",
+      "title": {
+        "en": "Light mode changed",
+        "no": "Lysmodus endret seg"
+      },
+      "hint": {
+        "en": "Fires when the light mode changes, whether from a button press, the Auk app, Homey or the daily reset to the schedule.",
+        "no": "Utløses når lysmodus endrer seg, enten fra knappen, Auk-appen, Homey eller den daglige tilbakestillingen til tidsplanen."
+      },
+      "tokens": [
+        {
+          "name": "mode",
+          "type": "string",
+          "title": {
+            "en": "Light mode",
+            "no": "Lysmodus"
+          },
+          "example": {
+            "en": "On",
+            "no": "På"
+          }
+        },
+        {
+          "name": "previous_mode",
+          "type": "string",
+          "title": {
+            "en": "Previous light mode",
+            "no": "Forrige lysmodus"
+          },
+          "example": {
+            "en": "Schedule",
+            "no": "Tidsplan"
+          }
+        }
+      ]
+    },
+    {
+      "id": "light_mode_changed_to",
+      "title": {
+        "en": "Light mode changed to …",
+        "no": "Lysmodus endret seg til …"
+      },
+      "titleFormatted": {
+        "en": "Light mode changed to [[mode]]",
+        "no": "Lysmodus endret seg til [[mode]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "mode",
+          "values": [
+            {
+              "id": "auto",
+              "label": {
+                "en": "Schedule",
+                "no": "Tidsplan"
+              }
+            },
+            {
+              "id": "full",
+              "label": {
+                "en": "On",
+                "no": "På"
+              }
+            },
+            {
+              "id": "dim",
+              "label": {
+                "en": "Dimmed",
+                "no": "Dempet"
+              }
+            },
+            {
+              "id": "off",
+              "label": {
+                "en": "Off",
+                "no": "Av"
+              }
+            }
+          ]
+        }
+      ],
+      "tokens": [
+        {
+          "name": "previous_mode",
+          "type": "string",
+          "title": {
+            "en": "Previous light mode",
+            "no": "Forrige lysmodus"
+          },
+          "example": {
+            "en": "Schedule",
+            "no": "Tidsplan"
+          }
+        }
+      ]
+    },
+    {
+      "id": "growth_mode_changed",
+      "title": {
+        "en": "Growth mode changed",
+        "no": "Vekstmodus endret seg"
+      },
+      "tokens": [
+        {
+          "name": "mode",
+          "type": "string",
+          "title": {
+            "en": "Growth mode",
+            "no": "Vekstmodus"
+          },
+          "example": {
+            "en": "On",
+            "no": "På"
+          }
+        },
+        {
+          "name": "previous_mode",
+          "type": "string",
+          "title": {
+            "en": "Previous growth mode",
+            "no": "Forrige vekstmodus"
+          },
+          "example": {
+            "en": "Schedule",
+            "no": "Tidsplan"
+          }
+        }
+      ]
+    },
+    {
+      "id": "growth_mode_changed_to",
+      "title": {
+        "en": "Growth mode changed to …",
+        "no": "Vekstmodus endret seg til …"
+      },
+      "titleFormatted": {
+        "en": "Growth mode changed to [[mode]]",
+        "no": "Vekstmodus endret seg til [[mode]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "mode",
+          "values": [
+            {
+              "id": "herbs",
+              "label": {
+                "en": "Herbs & salads",
+                "no": "Urter og salat"
+              }
+            },
+            {
+              "id": "fruit",
+              "label": {
+                "en": "Fruits & veggies",
+                "no": "Frukt og grønt"
+              }
+            },
+            {
+              "id": "slow",
+              "label": {
+                "en": "Slow",
+                "no": "Sakte"
+              }
+            }
+          ]
+        }
+      ],
+      "tokens": [
+        {
+          "name": "previous_mode",
+          "type": "string",
+          "title": {
+            "en": "Previous growth mode",
+            "no": "Forrige vekstmodus"
+          },
+          "example": {
+            "en": "Schedule",
+            "no": "Tidsplan"
+          }
+        }
+      ]
+    },
+    {
+      "id": "light_on_time_changed",
+      "title": {
+        "en": "Lights-on time changed",
+        "no": "Lys på-tidspunkt endret seg"
+      },
+      "hint": {
+        "en": "Fires when the daily lights-on time changes, for example when the light button on the garden restarts the cycle.",
+        "no": "Utløses når den daglige lys på-tidspunkten endrer seg, for eksempel når lysknappen på hagen starter syklusen på nytt."
+      },
+      "tokens": [
+        {
+          "name": "time",
+          "type": "string",
+          "title": {
+            "en": "Lights-on time",
+            "no": "Lys på-tidspunkt"
+          },
+          "example": "05:30"
+        },
+        {
+          "name": "previous_time",
+          "type": "string",
+          "title": {
+            "en": "Previous lights-on time",
+            "no": "Forrige lys på-tidspunkt"
+          },
+          "example": "07:00"
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "light_mode_is",
+      "title": {
+        "en": "Light mode is …",
+        "no": "Lysmodus er …"
+      },
+      "titleFormatted": {
+        "en": "Light mode !{{is|is not}} [[mode]]",
+        "no": "Lysmodus !{{er|er ikke}} [[mode]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "mode",
+          "values": [
+            {
+              "id": "auto",
+              "label": {
+                "en": "Schedule",
+                "no": "Tidsplan"
+              }
+            },
+            {
+              "id": "full",
+              "label": {
+                "en": "On",
+                "no": "På"
+              }
+            },
+            {
+              "id": "dim",
+              "label": {
+                "en": "Dimmed",
+                "no": "Dempet"
+              }
+            },
+            {
+              "id": "off",
+              "label": {
+                "en": "Off",
+                "no": "Av"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "growth_mode_is",
+      "title": {
+        "en": "Growth mode is …",
+        "no": "Vekstmodus er …"
+      },
+      "titleFormatted": {
+        "en": "Growth mode !{{is|is not}} [[mode]]",
+        "no": "Vekstmodus !{{er|er ikke}} [[mode]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "mode",
+          "values": [
+            {
+              "id": "herbs",
+              "label": {
+                "en": "Herbs & salads",
+                "no": "Urter og salat"
+              }
+            },
+            {
+              "id": "fruit",
+              "label": {
+                "en": "Fruits & veggies",
+                "no": "Frukt og grønt"
+              }
+            },
+            {
+              "id": "slow",
+              "label": {
+                "en": "Slow",
+                "no": "Sakte"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "light_on_time_is",
+      "title": {
+        "en": "Lights-on time is …",
+        "no": "Lys på-tidspunkt er …"
+      },
+      "titleFormatted": {
+        "en": "Lights-on time !{{is|is not}} [[time]]",
+        "no": "Lys på-tidspunkt !{{er|er ikke}} [[time]]"
+      },
+      "args": [
+        {
+          "type": "time",
+          "name": "time"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "set_light_mode",
+      "title": {
+        "en": "Set light mode",
+        "no": "Sett lysmodus"
+      },
+      "titleFormatted": {
+        "en": "Set light mode to [[mode]]",
+        "no": "Sett lysmodus til [[mode]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "mode",
+          "values": [
+            {
+              "id": "auto",
+              "label": {
+                "en": "Schedule",
+                "no": "Tidsplan"
+              }
+            },
+            {
+              "id": "full",
+              "label": {
+                "en": "On",
+                "no": "På"
+              }
+            },
+            {
+              "id": "dim",
+              "label": {
+                "en": "Dimmed",
+                "no": "Dempet"
+              }
+            },
+            {
+              "id": "off",
+              "label": {
+                "en": "Off",
+                "no": "Av"
+              }
+            }
+          ]
+        }
+      ],
+      "hint": {
+        "en": "On, dimmed and off last until the device returns to its schedule at the next daily reset.",
+        "no": "På, dempet og av varer til enheten går tilbake til tidsplanen ved neste daglige tilbakestilling."
+      }
+    },
+    {
+      "id": "set_growth_mode",
+      "title": {
+        "en": "Set growth mode",
+        "no": "Sett vekstmodus"
+      },
+      "titleFormatted": {
+        "en": "Set growth mode to [[mode]]",
+        "no": "Sett vekstmodus til [[mode]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "mode",
+          "values": [
+            {
+              "id": "herbs",
+              "label": {
+                "en": "Herbs & salads",
+                "no": "Urter og salat"
+              }
+            },
+            {
+              "id": "fruit",
+              "label": {
+                "en": "Fruits & veggies",
+                "no": "Frukt og grønt"
+              }
+            },
+            {
+              "id": "slow",
+              "label": {
+                "en": "Slow",
+                "no": "Sakte"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "set_light_on_time",
+      "title": {
+        "en": "Set lights-on time",
+        "no": "Sett lys på-tidspunkt"
+      },
+      "titleFormatted": {
+        "en": "Turn the light on daily at [[time]]",
+        "no": "Slå på lyset daglig kl. [[time]]"
+      },
+      "hint": {
+        "en": "The light stays on for 16 hours from this time each day, or 20 hours in Fruits & veggies.",
+        "no": "Lyset er på i 16 timer fra dette tidspunktet hver dag, eller 20 timer i Frukt og grønt."
+      },
+      "args": [
+        {
+          "type": "time",
+          "name": "time"
+        }
+      ]
+    }
+  ]
+}

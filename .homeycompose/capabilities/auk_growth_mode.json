@@ -1,0 +1,13 @@
+{
+  "type": "enum",
+  "title": { "en": "Growth mode", "no": "Vekstmodus" },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/growth_mode.svg",
+  "values": [
+    { "id": "herbs", "title": { "en": "Herbs & salads", "no": "Urter og salat" } },
+    { "id": "fruit", "title": { "en": "Fruits & veggies", "no": "Frukt og grønt" } },
+    { "id": "slow", "title": { "en": "Slow", "no": "Sakte" } }
+  ]
+}

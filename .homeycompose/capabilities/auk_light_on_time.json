@@ -1,0 +1,8 @@
+{
+  "type": "string",
+  "title": { "en": "Lights on at", "no": "Lys på kl." },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/clock.svg"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "enum",
+  "title": { "en": "Light mode", "no": "Lysmodus" },
+  "getable": true,
+  "setable": true,
+  "uiComponent": "picker",
+  "icon": "/assets/light_mode.svg",
+  "values": [
+    { "id": "auto", "title": { "en": "Schedule", "no": "Tidsplan" } },
+    { "id": "full", "title": { "en": "On", "no": "På" } },
+    { "id": "dim", "title": { "en": "Dimmed", "no": "Dempet" } },
+    { "id": "off", "title": { "en": "Off", "no": "Av" } }
+  ]
+}
