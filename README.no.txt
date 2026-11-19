@@ -1,4 +1,4 @@
-Styr Auk Mini 2-hagen din fra Homey. Appen snakker direkte med hagen over Bluetooth, så du trenger verken konto eller skytjeneste.
+Styr Auk Mini 2-hagen din fra Homey. Appen snakker direkte med hagen over Bluetooth.
 
 Slå lyset på eller av, demp det, eller la det følge den daglige tidsplanen. Bytt vekstmodus mellom Urter og salat, Frukt og grønt og Sakte, og velg når lyset skal slås på hver dag.
 

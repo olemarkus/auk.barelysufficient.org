@@ -1,4 +1,4 @@
-Control your Auk Mini 2 indoor garden from Homey. The app talks to the garden directly over Bluetooth, so no account or cloud connection is needed.
+Control your Auk Mini 2 indoor garden from Homey. The app talks to the garden directly over Bluetooth.
 
 Turn the light on or off, dim it, or let it follow the daily schedule. Switch growth mode between Herbs & salads, Fruits & veggies and Slow, and choose what time the light comes on each day.
 
