@@ -1,13 +1,5 @@
-Control and follow your Auk Mini 2 indoor garden from Homey, locally over Bluetooth. No cloud account needed.
+Control your Auk Mini 2 indoor garden from Homey. The app talks to the garden directly over Bluetooth, so no account or cloud connection is needed.
 
-- Turn the light on and off, or pick on, dimmed, off or back to the schedule
-- Pick the growth mode: herbs & salads, fruits & veggies or slow
-- Set when the light turns on each day (it stays on for 16 hours, or 20 in Fruits & veggies)
-- See when the light next turns on and off
-- Start Flows when the light mode or growth mode changes, whether it changed from the button on the garden, the Auk app or Homey
+Turn the light on or off, dim it, or let it follow the daily schedule. Switch growth mode between Herbs & salads, Fruits & veggies and Slow, and choose what time the light comes on each day.
 
-Homey keeps the garden's clock in step with local time, including daylight saving changes.
-
-Before adding the garden: if it is registered in the Auk app, remove it there first. The garden accepts one Bluetooth connection at a time, and Homey keeps that connection open so changes show up right away.
-
-This app is not affiliated with or endorsed by Auk Eco AS.
+Flows can start when the light mode or growth mode changes, also when the change was made in the Auk app. Use them to dim the light during a film, turn it off at bedtime, or get a notification when someone changes the growth mode. There are Flow conditions and actions for the same settings, so the garden can follow the rest of your home.
