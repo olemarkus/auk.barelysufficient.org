@@ -16,6 +16,23 @@
     "no": "Følg med på og styr Auk-hagen din"
   },
   "category": "appliances",
+  "homeyCommunityTopicId": 162715,
+  "homepage": "https://github.com/olemarkus/auk.barelysufficient.org#readme",
+  "support": "mailto:olemarkus@gmail.com",
+  "bugs": {
+    "url": "https://github.com/olemarkus/auk.barelysufficient.org/issues"
+  },
+  "source": "https://github.com/olemarkus/auk.barelysufficient.org",
+  "contributing": {
+    "donate": {
+      "githubSponsors": {
+        "username": "olemarkus"
+      },
+      "paypal": {
+        "username": "olemwith"
+      }
+    }
+  },
   "tags": {
     "en": [
       "auk",
