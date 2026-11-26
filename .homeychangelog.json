@@ -2,5 +2,9 @@
   "0.1.0": {
     "en": "First version. Pair an Auk Mini 2 over Bluetooth, see and change its light and growth modes, and use them in Flows.",
     "no": "Første versjon. Koble til en Auk Mini 2 over Bluetooth, se og endre lys- og vekstmodus, og bruk dem i Flows."
+  },
+  "1.0.0": {
+    "en": "Find the Auk community forum, support email, bug tracker, source code, and donation links on the Homey App Store page.",
+    "no": "Finn Auk-forumet, kontaktinformasjon, feilrapportering, kildekode og donasjonslenker på appsiden i Homey App Store."
   }
 }

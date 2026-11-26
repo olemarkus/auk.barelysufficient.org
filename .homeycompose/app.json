@@ -1,6 +1,6 @@
 {
   "id": "org.barelysufficient.auk",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "compatibility": ">=12.3.0",
   "platforms": ["local"],
   "sdk": 3,
